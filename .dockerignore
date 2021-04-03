@@ -1,0 +1,5 @@
+LICENSE
+README.md
+version-base.txt
+Jenkinsfile*
+helm-chart

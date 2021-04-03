@@ -1,0 +1,14 @@
+
+name: dummy-app
+
+image:
+  repository: PROD-REGISTRY
+  imageName: dummy-app
+  tag: VERSION_NAME
+  pullPolicy: Always
+
+service:
+  loadBalancerIP: PROD-CLUSTER-DNS-NAME
+  port: 5000
+
+environment: prod
