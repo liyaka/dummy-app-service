@@ -8,7 +8,7 @@ node ("ci") {
     pipeline.orgName = liyaka
     pipeline.projectName = "dummy-app-service"
     pipeline.dockerImageName = "dummy-app"
-    pipeline.preBuildCommand = "VERSION=`cat version-base.txt`.${BUILD_NUMBER};echo $VERSION > version.txt"
+    pipeline.preBuildCommand = "VERSION=`cat version-base.txt`.${BUILD_NUMBER};echo \$VERSION > version.txt"
 
     pipeline.setBranchProperties()
     pipeline.run()
