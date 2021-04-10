@@ -1,0 +1,45 @@
+name: CI flow
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-20.04
+
+    env:
+      REGISTRY_URL: 329054710135.dkr.ecr.eu-west-1.amazonaws.com
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set Version
+      run: |
+        echo "VERSION=`cat version-base.txt`.${{ github.run_number }};" >> $GITHUB_ENV
+    - name: Build the Docker image
+      run: |
+        echo ${VERSION} > version.txt
+        docker build -t ${REGISTRY_URL}dummy-app:${VERSION} .
+
+    - name: List values files
+      id: finding-files
+      working-directory: ./helm-chart
+      run: |
+          echo "::set-output name=VALUESFILELIST::$(find . -name 'values-*.yaml' -print)"
+    - name: Helm lint
+      working-directory: ./helm-chart/
+      run: |
+        IFS="," read -a myarray <<< ${{ steps.finding-files.outputs.VALUESFILELIST }}
+        for f in "${myarray[@]}"; do helm lint -f $f dummy-app; done
+
+    - name: Push to ECR
+      id: ecr
+      uses: jwalton/gh-ecr-push@v1
+      with:
+        access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        region: eu-west-1
+        image: ${REGISTRY_URL}dummy-app:${VERSION}
