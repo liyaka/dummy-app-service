@@ -45,10 +45,14 @@ jobs:
         region: eu-west-1
         image: ${IMAGE_NAME}:${VERSION}
 
-    - name: Notify to Slack
-      uses: act10ns/slack@v1.2.2
-      with:
-        status: ${{ job.status }}
-        steps: ${{ toJson(steps) }}
-        channel: '#${IMAGE_NAME}-ci'
+    - name: Slack Notification
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_CHANNEL: general
+        SLACK_COLOR: ${{ job.status }} # or a specific color like 'green' or '#ff00ff'
+        # SLACK_ICON: https://github.com/rtCamp.png?size=48
+        SLACK_MESSAGE: Job ${GITHUB_JOB} has finished with status ${{ job.status }}
+        SLACK_USERNAME: liyaka
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
       if: always()
+        
