@@ -22,7 +22,7 @@ jobs:
     - name: Build the Docker image
       run: |
         echo ${VERSION} > version.txt
-        docker build -t ${REGISTRY_URL}/dummy-app:${VERSION} .
+        docker build -t "${REGISTRY_URL}/dummy-app:${VERSION}" .
 
     - name: List values files
       id: finding-files
