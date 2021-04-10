@@ -12,7 +12,8 @@ jobs:
     runs-on: ubuntu-20.04
 
     env:
-      REGISTRY_URL: 329054710135.dkr.ecr.eu-west-1.amazonaws.com
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+      IMAGE_NAME: dummy-app
 
     steps:
     - uses: actions/checkout@v2
@@ -22,7 +23,7 @@ jobs:
     - name: Build the Docker image
       run: |
         echo ${VERSION} > version.txt
-        docker build -t dummy-app:${VERSION} .
+        docker build -t ${IMAGE_NAME}:${VERSION} .
 
     - name: List values files
       id: finding-files
@@ -33,7 +34,7 @@ jobs:
       working-directory: ./helm-chart/
       run: |
         IFS="," read -a myarray <<< ${{ steps.finding-files.outputs.VALUESFILELIST }}
-        for f in "${myarray[@]}"; do helm lint -f $f dummy-app; done
+        for f in "${myarray[@]}"; do helm lint -f $f ${IMAGE_NAME}; done
 
     - name: Push to ECR
       id: ecr
@@ -42,4 +43,12 @@ jobs:
         access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         region: eu-west-1
-        image: dummy-app:${VERSION}
+        image: ${IMAGE_NAME}:${VERSION}
+
+    - name: Notify to Slack
+      uses: act10ns/slack@v1
+      with:
+        status: ${{ job.status }}
+        steps: ${{ toJson(steps) }}
+        channel: '#${IMAGE_NAME}-ci'
+      if: always()
