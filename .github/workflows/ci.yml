@@ -45,6 +45,13 @@ jobs:
         region: eu-west-1
         image: ${IMAGE_NAME}:${VERSION}
 
+    - name: Create Tag
+      if: ${{ job.status }} == "success"
+      uses: anothrNick/github-tag-action@1.33.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        CUSTOM_TAG: ${VERSION}
+
     - name: Slack Notification
       uses: rtCamp/action-slack-notify@v2
       env:
@@ -55,4 +62,3 @@ jobs:
         SLACK_USERNAME: liyaka
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
       if: always()
-        
