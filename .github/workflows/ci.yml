@@ -22,7 +22,7 @@ jobs:
     - name: Build the Docker image
       run: |
         echo ${VERSION} > version.txt
-        docker build -t ${REGISTRY_URL}dummy-app:${VERSION} .
+        docker build -t ${REGISTRY_URL}/dummy-app:${VERSION} .
 
     - name: List values files
       id: finding-files
@@ -42,4 +42,4 @@ jobs:
         access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         region: eu-west-1
-        image: ${REGISTRY_URL}dummy-app:${VERSION}
+        image: ${REGISTRY_URL}/dummy-app:${VERSION}
